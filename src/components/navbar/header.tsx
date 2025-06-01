@@ -3,7 +3,7 @@ import { Input } from '../ui/input';
 
 const Header = () => {
 	return (
-		<header className='shadow-sm rounded-b-lg'>
+		<header className='shadow-sm rounded-b-lg sticky top-0 z-50 bg-white'>
 			<div className='flex items-center justify-center py-2'>
 				<div className='flex items-center justify-between w-7xl'>
 					{/* LOGO */}
@@ -45,7 +45,7 @@ const Header = () => {
 					</div>
 
 					{/* ACTIONS */}
-					<div className='flex items-center gap-4'>
+					<div className='flex items-center gap-2'>
 						<Button variant='ghost'>Login</Button>
 						<Button variant='outline'>Sign Up</Button>
 					</div>
