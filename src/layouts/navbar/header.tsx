@@ -27,14 +27,7 @@ const Header = () => {
 						<li>
 							<p>
 								<a href='/' className=''>
-									History
-								</a>
-							</p>
-						</li>
-						<li>
-							<p>
-								<a href='/' className=''>
-									Pricing
+									Features
 								</a>
 							</p>
 						</li>
@@ -42,6 +35,13 @@ const Header = () => {
 							<p>
 								<a href='/' className=''>
 									About
+								</a>
+							</p>
+						</li>
+						<li>
+							<p>
+								<a href='/' className=''>
+									Reviews
 								</a>
 							</p>
 						</li>

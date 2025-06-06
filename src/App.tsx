@@ -4,6 +4,7 @@ import Footer from './layouts/navbar/footer';
 import { Input } from './components/ui/input';
 import { useState, useEffect } from 'react';
 import ReviewContent from './layouts/ReviewContent';
+import FeatureContent from './layouts/FeatureContent';
 
 function App() {
 	const [link, setLink] = useState('');
@@ -138,9 +139,9 @@ function App() {
 		<>
 			<Header />
 
-			<div className='flex min-h-svh flex-col items-center justify-start pt-[2rem] gap-10'>
+			<main className='flex min-h-svh flex-col items-center justify-start pt-[2rem] gap-10'>
 				{/* DOWNLOADER */}
-				<div className='flex flex-col items-center justify-center gap-10'>
+				<div className='flex flex-col items-center justify-center gap-5'>
 					<span className='flex flex-col items-center justify-center gap-2'>
 						<h1 className='text-4xl font-semibold'>Free Online Video Downloader</h1>
 						<p className='text-sm text-muted-foreground'>
@@ -300,13 +301,14 @@ function App() {
 				</div>
 
 				{/* FEATURES */}
-				{/* <div className='flex flex-col items-center justify-center'>
-					<h1 className='text-2xl font-bold'>About</h1>
-				</div> */}
+				<FeatureContent />
+
+				{/* LINE STRACH */}
+				<div className='w-xl h-[2.5px] bg-black/20 rounded-4xl'></div>
 
 				{/* REVIEW */}
 				<ReviewContent />
-			</div>
+			</main>
 
 			<Footer />
 		</>
