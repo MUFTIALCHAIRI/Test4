@@ -124,3 +124,17 @@
 		@apply bg-background text-foreground;
 	}
 }
+
+@layer components {
+	.button-action {
+		@apply flex gap-2 px-5 py-2 rounded-sm text-white items-center transition duration-150 ease-in-out cursor-pointer hover:scale-105 hover:shadow-md;
+	}
+
+	.button-action.active {
+		@apply scale-105 shadow-md;
+	}
+
+	.button-action.disabled {
+		@apply opacity-50 cursor-not-allowed hover:scale-100 hover:shadow-none;
+	}
+}

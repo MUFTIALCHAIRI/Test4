@@ -19,22 +19,30 @@ const Header = () => {
 					<ul className='flex items-center  justify-center gap-10 w-1/2'>
 						<li>
 							<p>
-								<a href='/'>Home</a>
+								<a href='/' className=''>
+									Home
+								</a>
 							</p>
 						</li>
 						<li>
 							<p>
-								<a href='/'>History</a>
+								<a href='/' className=''>
+									History
+								</a>
 							</p>
 						</li>
 						<li>
 							<p>
-								<a href='/'>Pricing</a>
+								<a href='/' className=''>
+									Pricing
+								</a>
 							</p>
 						</li>
 						<li>
 							<p>
-								<a href='/'>About</a>
+								<a href='/' className=''>
+									About
+								</a>
 							</p>
 						</li>
 					</ul>
