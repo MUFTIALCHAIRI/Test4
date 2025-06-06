@@ -1,10 +1,9 @@
 import { Button } from '@/components/ui/button';
-import Header from './components/navbar/header';
-import Footer from './components/navbar/footer';
+import Header from './layouts/navbar/header';
+import Footer from './layouts/navbar/footer';
 import { Input } from './components/ui/input';
 import { useState, useEffect } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from './components/ui/avatar';
-import ReviewContent from './components/layouts/ReviewContent';
+import ReviewContent from './layouts/ReviewContent';
 
 function App() {
 	const [link, setLink] = useState('');
@@ -12,6 +11,8 @@ function App() {
 	const [videoTitle, setVideoTitle] = useState('');
 	const [videoType, setVideoType] = useState('');
 	const [isValidUrl, setIsValidUrl] = useState(false);
+
+	const [resolution, setResolution] = useState(1);
 
 	// Function to extract YouTube video ID
 	const getYoutubeVideoId = (url: string) => {
@@ -29,6 +30,7 @@ function App() {
 			setVideoTitle('');
 			setVideoType('');
 			setIsValidUrl(false);
+			setResolution(1);
 			return;
 		}
 
@@ -49,24 +51,30 @@ function App() {
 				setVideoTitle('YouTube Video');
 				setVideoType('youtube');
 				setIsValidUrl(true);
+				// Keep resolution state if already set, as we're still on YouTube
 			}
 		}
 		// Check for Facebook URL
 		else if (checkedLink.match(/(facebook\.com|fb\.com|fb\.watch)/i)) {
 			setVideoTitle('Facebook Video');
 			setVideoType('facebook');
+			setThumbnail('');
 			setIsValidUrl(true);
+			setResolution(1); // Reset resolution for non-YouTube URL
 		}
 		// Check for Instagram URL
 		else if (checkedLink.match(/(instagram\.com|instagr\.am)/i)) {
 			setVideoTitle('Instagram Post');
 			setVideoType('instagram');
+			setThumbnail('');
 			setIsValidUrl(true);
+			setResolution(1); // Reset resolution for non-YouTube URL
 		} else {
 			setIsValidUrl(false);
 			setThumbnail('');
 			setVideoTitle('');
 			setVideoType('');
+			setResolution(1); // Reset resolution for invalid URL
 		}
 	}, [link]);
 
@@ -85,8 +93,32 @@ function App() {
 
 		// Check if the URL is from YouTube, Facebook, or Instagram
 		if (checkedLink.match(/(youtube\.com|youtu\.be)/i)) {
-			alert('YouTube URL detected! Processing...');
-			// Add YouTube download logic here
+			if (videoType === 'youtube' && resolution === 1) {
+				alert('Please select a resolution first');
+				return;
+			}
+
+			// Get resolution text for the alert
+			let resolutionText = '';
+			switch (resolution) {
+				case 5:
+					resolutionText = '1080p';
+					break;
+				case 4:
+					resolutionText = '720p';
+					break;
+				case 3:
+					resolutionText = '480p';
+					break;
+				case 2:
+					resolutionText = '360p';
+					break;
+				default:
+					resolutionText = 'unknown';
+			}
+
+			alert(`Processing YouTube download at ${resolutionText} resolution...`);
+			// Add YouTube download logic here with selected resolution
 			return;
 		} else if (checkedLink.match(/(facebook\.com|fb\.com|fb\.watch)/i)) {
 			alert('Facebook URL detected! Processing...');
@@ -129,7 +161,7 @@ function App() {
 							variant={'ghost'}
 							className='text-white rounded-sm hover:bg-[#99BC85] hover:text-white cursor-pointer'
 							onClick={handleSumbit}
-							disabled={!isValidUrl}
+							disabled={!isValidUrl || (videoType === 'youtube' && resolution === 1)}
 						>
 							Download
 						</Button>
@@ -163,34 +195,54 @@ function App() {
 
 							<div className='flex items-center justify-center gap-2 mt-2'>
 								<Button
-									variant='outline'
-									className='bg-white text-black hover:bg-gray-100'
+									variant={resolution === 5 ? 'default' : 'outline'}
+									className={
+										'cursor-pointer ' +
+										(resolution === 5
+											? 'bg-[#99BC85] text-white hover:bg-[#88ab74]'
+											: 'bg-white text-black hover:bg-gray-100 hover:text-black ')
+									}
 									disabled={!isValidUrl || videoType !== 'youtube'}
-									onClick={() => alert('Download in 1080p')}
+									onClick={() => setResolution(5)}
 								>
 									1080p
 								</Button>
 								<Button
-									variant='outline'
-									className='bg-white text-black hover:bg-gray-100'
+									variant={resolution === 4 ? 'default' : 'outline'}
+									className={
+										'cursor-pointer ' +
+										(resolution === 4
+											? 'bg-[#99BC85] text-white hover:bg-[#88ab74]'
+											: 'bg-white text-black hover:bg-gray-100 hover:text-black ')
+									}
 									disabled={!isValidUrl || videoType !== 'youtube'}
-									onClick={() => alert('Download in 720p')}
+									onClick={() => setResolution(4)}
 								>
 									720p
 								</Button>
 								<Button
-									variant='outline'
-									className='bg-white text-black hover:bg-gray-100'
+									variant={resolution === 3 ? 'default' : 'outline'}
+									className={
+										'cursor-pointer ' +
+										(resolution === 3
+											? 'bg-[#99BC85] text-white hover:bg-[#88ab74]'
+											: 'bg-white text-black hover:bg-gray-100 hover:text-black ')
+									}
 									disabled={!isValidUrl || videoType !== 'youtube'}
-									onClick={() => alert('Download in 480p')}
+									onClick={() => setResolution(3)}
 								>
 									480p
 								</Button>
 								<Button
-									variant='outline'
-									className='bg-white text-black hover:bg-gray-100'
+									variant={resolution === 2 ? 'default' : 'outline'}
+									className={
+										'cursor-pointer ' +
+										(resolution === 2
+											? 'bg-[#99BC85] text-white hover:bg-[#88ab74]'
+											: 'bg-white text-black hover:bg-gray-100 hover:text-black ')
+									}
 									disabled={!isValidUrl || videoType !== 'youtube'}
-									onClick={() => alert('Download in 360p')}
+									onClick={() => setResolution(2)}
 								>
 									360p
 								</Button>
