@@ -1,6 +1,6 @@
 const FeatureContent = () => {
 	return (
-		<div className='flex flex-col items-center justify-center w-3xl gap-10'>
+		<div id='features' className='flex flex-col items-center justify-center w-3xl gap-10'>
 			<h1 className='text-xl font-semibold text-black/80'>Feature of Online Video Downloader</h1>
 
 			<span className='grid grid-cols-3 gap-14'>
@@ -46,6 +46,9 @@ const FeatureContent = () => {
 					</small>
 				</div>
 			</span>
+
+			{/* LINE STRACH */}
+			<div className='w-xl h-[2.5px] bg-black/20 rounded-4xl'></div>
 		</div>
 	);
 };

@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button';
 import { REVIEW } from '@/constant';
 
 // Define the review item type
@@ -10,15 +11,24 @@ interface ReviewItem {
 
 const ReviewContent = () => {
 	return (
-		<div className='flex flex-col items-center justify-center gap-5 w-7xl'>
-			<h1 className='text-xl font-semibold text-black/80'>Our Users Love Us</h1>
+		<div id='reviews' className='flex flex-col items-center justify-center gap-5 w-7xl'>
+			<span className='flex items-center justify-center flex-col gap-2'>
+				<small className='text-black/60'>Enjoyed using our dowloader? Rate Us!</small>
 
+				<Button
+					variant={'outline'}
+					className='rounded-sm hover:bg-[#99BC85] hover:text-white cursor-pointer'
+				>
+					Feedback Here!
+				</Button>
+			</span>
+			<h1 className='text-xl font-semibold text-black/80'>Our Users Love Us</h1>{' '}
 			{/* LIST REVIEWS */}
-			<div className='flex flex-wrap items-center justify-center gap-4'>
+			<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-7xl'>
 				{REVIEW.map((item: ReviewItem) => (
 					<div
 						key={item.id}
-						className='rounded-md border px-5 py-4 grid gap-3 w-[25rem] shadow-sm hover:shadow-md transition-shadow'
+						className='rounded-md border px-5 py-4 grid gap-3 shadow-sm hover:shadow-md transition-shadow'
 					>
 						{/* STAR */}
 						<span className='flex items-center justify-start gap-1'>

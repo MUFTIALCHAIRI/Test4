@@ -5,6 +5,7 @@ import { Input } from './components/ui/input';
 import { useState, useEffect } from 'react';
 import ReviewContent from './layouts/ReviewContent';
 import FeatureContent from './layouts/FeatureContent';
+import GuideContent from './layouts/GuideContent';
 
 function App() {
 	const [link, setLink] = useState('');
@@ -141,7 +142,7 @@ function App() {
 
 			<main className='flex min-h-svh flex-col items-center justify-start pt-[2rem] gap-10'>
 				{/* DOWNLOADER */}
-				<div className='flex flex-col items-center justify-center gap-5'>
+				<div className='flex flex-col items-center justify-center gap-5' id='home'>
 					<span className='flex flex-col items-center justify-center gap-2'>
 						<h1 className='text-4xl font-semibold'>Free Online Video Downloader</h1>
 						<p className='text-sm text-muted-foreground'>
@@ -300,11 +301,11 @@ function App() {
 					</div>
 				</div>
 
+				{/* GUIDE */}
+				<GuideContent />
+
 				{/* FEATURES */}
 				<FeatureContent />
-
-				{/* LINE STRACH */}
-				<div className='w-xl h-[2.5px] bg-black/20 rounded-4xl'></div>
 
 				{/* REVIEW */}
 				<ReviewContent />
