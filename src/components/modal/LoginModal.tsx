@@ -29,7 +29,7 @@ export function LoginModal({
 		e.preventDefault();
 		setIsSubmitting(true);
 		try {
-			const res = await fetch(`${API_BASE_URL}${LOGIN_ENDPOINT}`, {
+			const res = await fetch(`${API_BASE_URL}/login`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ login: username, password }),

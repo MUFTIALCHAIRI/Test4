@@ -38,7 +38,7 @@ export function SignupModal({
 
 		setIsSubmitting(true);
 		try {
-			const res = await fetch(`${API_BASE_URL}${REGISTER_ENDPOINT}`, {
+			const res = await fetch(`${API_BASE_URL}/register`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ username: name, email: email, password }),

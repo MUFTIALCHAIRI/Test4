@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:8000}
+      - VITE_LOGIN_ENDPOINT=${VITE_LOGIN_ENDPOINT:-/login}
+      - VITE_REGISTER_ENDPOINT=${VITE_REGISTER_ENDPOINT:-/register}
+      - VITE_USER_ENDPOINT=${VITE_USER_ENDPOINT:-/users/me}
+    restart: unless-stopped
+
+  # Uncomment this section when you have a backend API
+  # backend:
+  #   build:
+  #     context: ../path-to-backend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8000:8000"
+  #   environment:
+  #     - DATABASE_URL=your_database_connection_string
+  #   restart: unless-stopped
+  #   # depends_on:
+  #   #   - db
+  
+  # Uncomment this section if you need a database
+  # db:
+  #   image: postgres:latest
+  #   environment:
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=postgres
+  #     - POSTGRES_DB=comot_in
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   restart: unless-stopped
+
+# Uncomment if using PostgreSQL
+# volumes:
+#   postgres_data:

@@ -73,7 +73,7 @@ export function Dashboard({ token, setToken }: DashboardProps) {
 					// Fallback to API call if token doesn't contain user info
 					// In a real app, this would be an API call to your backend
 					try {
-						const response = await fetch(`${API_BASE_URL}${USER_ENDPOINT}`, {
+						const response = await fetch(`${API_BASE_URL}/users/me`, {
 							headers: { Authorization: `Bearer ${token}` },
 						});
 
