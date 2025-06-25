@@ -10,7 +10,7 @@ const GuideContent = () => {
 			</span>
 
 			<span className='grid grid-cols-1 md:grid-cols-3 gap-5'>
-				{/* Step 1 */}
+				{/* Step 1 */}	
 				<div className='flex flex-col items-center text-center p-6 rounded-lg border shadow-sm'>
 					<div className='h-12 w-12 flex items-center justify-center rounded-full bg-[#99BC85] text-white font-bold text-xl mb-4'>
 						1
