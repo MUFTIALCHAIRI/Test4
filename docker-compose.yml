@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3000:80"
+      - '3000:80'
     environment:
       - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:8000}
       - VITE_LOGIN_ENDPOINT=${VITE_LOGIN_ENDPOINT:-/login}
@@ -26,7 +26,7 @@ services:
   #   restart: unless-stopped
   #   # depends_on:
   #   #   - db
-  
+
   # Uncomment this section if you need a database
   # db:
   #   image: postgres:latest
@@ -39,7 +39,6 @@ services:
   #   volumes:
   #     - postgres_data:/var/lib/postgresql/data
   #   restart: unless-stopped
-
 # Uncomment if using PostgreSQL
 # volumes:
 #   postgres_data:
