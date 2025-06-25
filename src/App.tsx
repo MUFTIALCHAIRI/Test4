@@ -96,8 +96,7 @@ function App() {
 			setVideoTitle(videoId ? 'Facebook Video' : 'Invalid Facebook URL');
 			setVideoType('facebook');
 			// Facebook thumbnails require API access, use a placeholder
-			setThumbnail('/facebook-placeholder.jpg');
-			setIsValidUrl(!!videoId);
+			setIsValidUrl(true);
 			setResolution(1); // Reset resolution for non-YouTube URL
 		}
 		// Check for Instagram URL
@@ -331,16 +330,18 @@ function App() {
 						<span className='flex flex-col items-center justify-center gap-4'>
 							<div className='w-full max-w-md rounded-lg overflow-hidden shadow-lg'>
 								<div className='relative'>
-									<img
-										src={thumbnail}
-										alt={videoTitle}
-										className='w-full h-auto'
-										onError={(e) => {
-											// Fallback image if thumbnail fails to load
-											const target = e.target as HTMLImageElement;
-											target.src = 'https://via.placeholder.com/480x360?text=Video+Preview';
-										}}
-									/>
+									{videoType === 'youtube' && (
+										<img
+											src={thumbnail}
+											alt={videoTitle}
+											className='w-full h-auto'
+											onError={(e) => {
+												// Fallback image if thumbnail fails to load
+												const target = e.target as HTMLImageElement;
+												target.src = 'https://via.placeholder.com/480x360?text=Video+Preview';
+											}}
+										/>
+									)}
 									<div className='absolute bottom-0 left-0 right-0 bg-black/50 text-white p-3'>
 										<div className='flex items-center'>
 											{videoType === 'youtube' && (
