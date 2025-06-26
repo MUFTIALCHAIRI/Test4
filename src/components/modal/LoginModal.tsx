@@ -10,7 +10,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { API_BASE_URL, LOGIN_ENDPOINT, AUTH_TOKEN_KEY } from '@/constant';
+import { API_BASE_URL, AUTH_TOKEN_KEY } from '@/constant';
 
 export function LoginModal({
 	isOpen,

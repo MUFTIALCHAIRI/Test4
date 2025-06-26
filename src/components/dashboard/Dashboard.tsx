@@ -1,13 +1,11 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { API_BASE_URL, USER_ENDPOINT, AUTH_TOKEN_KEY } from '@/constant';
-import { LogoutConfirmationModal } from '../modal/LogoutConfirmationModal';
+import { API_BASE_URL } from '@/constant';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 interface DashboardProps {
 	token: string;
-	setToken: (token: string) => void;
 }
 
 interface UserData {
@@ -18,9 +16,9 @@ interface UserData {
 
 interface DownloadItem {
 	id: number;
-	url: string;
-	date: string;
-	type: string;
+	platform: string;
+	original_url: string;
+	downloaded_at: string;
 }
 
 // Function to decode JWT token
@@ -42,16 +40,16 @@ const parseJwt = (token: string) => {
 	}
 };
 
-export function Dashboard({ token, setToken }: DashboardProps) {
+export function Dashboard({ token }: DashboardProps) {
+	const navigate = useNavigate();
 	const [userData, setUserData] = useState<UserData | null>(null);
 	const [downloadHistory, setDownloadHistory] = useState<DownloadItem[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
-	const [downloadUrl, setDownloadUrl] = useState('');
-	const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
 
 	useEffect(() => {
 		// Check if user has valid token
 		if (!token) {
+			navigate('/');
 			return;
 		}
 
@@ -71,9 +69,9 @@ export function Dashboard({ token, setToken }: DashboardProps) {
 					});
 				} else {
 					// Fallback to API call if token doesn't contain user info
-					// In a real app, this would be an API call to your backend
 					try {
-						const response = await fetch(`${API_BASE_URL}/users/me`, {
+						const response = await fetch(`${API_BASE_URL}/user/me`, {
+							method: 'GET',
 							headers: { Authorization: `Bearer ${token}` },
 						});
 
@@ -82,7 +80,8 @@ export function Dashboard({ token, setToken }: DashboardProps) {
 							setUserData({
 								username: data.username || 'User',
 								email: data.email || 'user@example.com',
-								downloads: parseInt(localStorage.getItem('downloadCount') || '0'),
+								downloads:
+									data.total_downloads || parseInt(localStorage.getItem('downloadCount') || '0'),
 							});
 						} else {
 							throw new Error('Failed to fetch user data');
@@ -98,9 +97,38 @@ export function Dashboard({ token, setToken }: DashboardProps) {
 					}
 				}
 
-				// Get recent downloads from local storage or API
-				const recentDownloads = JSON.parse(localStorage.getItem('recentDownloads') || '[]');
-				setDownloadHistory(recentDownloads.slice(0, 5)); // Show only last 5 downloads
+				// Fetch download history from API
+				try {
+					const historyResponse = await fetch(`${API_BASE_URL}/download-history`, {
+						method: 'GET',
+						headers: {
+							Authorization: `Bearer ${token}`,
+							'Content-Type': 'application/json',
+						},
+					});
+
+					if (historyResponse.ok) {
+						const historyData = await historyResponse.json();
+						// Take only the last 10 downloads and sort by most recent
+						const sortedHistory = historyData
+							.sort(
+								(a: DownloadItem, b: DownloadItem) =>
+									new Date(b.downloaded_at).getTime() - new Date(a.downloaded_at).getTime()
+							)
+							.slice(0, 10);
+						setDownloadHistory(sortedHistory);
+					} else {
+						console.error('Failed to fetch download history:', historyResponse.statusText);
+						// Fallback to localStorage if API fails
+						const recentDownloads = JSON.parse(localStorage.getItem('recentDownloads') || '[]');
+						setDownloadHistory(recentDownloads.slice(0, 5));
+					}
+				} catch (error) {
+					console.error('Error fetching download history:', error);
+					// Fallback to localStorage if API fails
+					const recentDownloads = JSON.parse(localStorage.getItem('recentDownloads') || '[]');
+					setDownloadHistory(recentDownloads.slice(0, 5));
+				}
 
 				setIsLoading(false);
 			} catch (error) {
@@ -111,55 +139,11 @@ export function Dashboard({ token, setToken }: DashboardProps) {
 		};
 
 		fetchUserData();
-	}, [token]);
-
-	const handleLogout = () => {
-		localStorage.removeItem(AUTH_TOKEN_KEY);
-		setToken('');
-		setIsLogoutConfirmOpen(false);
-		toast.success('Logout successful! See you again soon.');
-	};
-
-	const handleDownload = (event: React.FormEvent) => {
-		event.preventDefault();
-		if (!downloadUrl.trim()) {
-			toast.error('Please enter a URL');
-			return;
-		}
-
-		toast.info('Processing your download request...');
-		// In a real app, you would call your download API here
-
-		// For now, just add to history for demo purposes
-		const newDownload = {
-			id: Date.now(),
-			url: downloadUrl,
-			date: new Date().toISOString().split('T')[0],
-			type: downloadUrl.includes('youtube')
-				? 'youtube'
-				: downloadUrl.includes('facebook')
-				? 'facebook'
-				: downloadUrl.includes('instagram')
-				? 'instagram'
-				: 'other',
-		};
-
-		const history = [newDownload, ...downloadHistory].slice(0, 5);
-		setDownloadHistory(history);
-		localStorage.setItem('recentDownloads', JSON.stringify(history));
-
-		// Update download count
-		const newCount = (userData?.downloads || 0) + 1;
-		setUserData((prev) => (prev ? { ...prev, downloads: newCount } : null));
-		localStorage.setItem('downloadCount', newCount.toString());
-
-		setDownloadUrl('');
-		toast.success('Download added to your history');
-	};
+	}, [token, navigate]);
 
 	if (isLoading) {
 		return (
-			<div className='flex items-center justify-center min-h-screen bg-gray-50'>
+			<div className='flex items-center justify-center min-h-screen'>
 				<div className='text-center'>
 					<div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#99BC85] mx-auto'></div>
 					<p className='mt-4 text-[#99BC85]'>Loading your dashboard...</p>
@@ -170,59 +154,25 @@ export function Dashboard({ token, setToken }: DashboardProps) {
 
 	return (
 		<>
-			<div className='min-h-screen bg-gray-50'>
-				{/* Header */}
-				<div className='bg-white shadow'>
-					<div className='max-w-6xl mx-auto px-4 sm:px-6 lg:px-8'>
-						<div className='flex justify-between items-center py-4'>
-							<div className='flex items-center'>
-								<img src='/comot.in-logo.png' alt='Comot.in Logo' className='h-10 w-auto' />
-								<h1 className='ml-3 text-xl font-semibold text-gray-900'>Dashboard</h1>
-							</div>
-							<Button
-								onClick={() => setIsLogoutConfirmOpen(true)}
-								className='bg-[#99BC85] hover:bg-[#88ab74] text-white'
-							>
-								Logout
-							</Button>
-						</div>
-					</div>
-				</div>
-
+			<div className='min-h-screen'>
 				<div className='max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6'>
 					{/* Welcome Card */}
 					<div className='bg-white shadow rounded-lg p-6 mb-6'>
 						<div className='flex items-center'>
-							<div className='h-14 w-14 rounded-full bg-[#99BC85] flex items-center justify-center text-white text-xl font-bold'>
-								{userData?.username.charAt(0).toUpperCase()}
-							</div>
+							<Avatar className='h-14 w-14'>
+								<AvatarImage src='https://github.com/evilrabbit.png' alt='@evilrabbit' />
+								<AvatarFallback>ER</AvatarFallback>
+							</Avatar>
 							<div className='ml-4'>
 								<h2 className='text-lg font-semibold'>Welcome, {userData?.username}</h2>
 								<p className='text-gray-600 text-sm'>{userData?.email}</p>
 							</div>
 							<div className='ml-auto bg-gray-100 px-3 py-1.5 rounded-full'>
 								<span className='text-sm font-medium text-gray-700'>
-									{userData?.downloads} downloads
+									{downloadHistory.length} downloads
 								</span>
 							</div>
 						</div>
-					</div>
-
-					{/* New Download - Simplified */}
-					<div className='bg-white shadow rounded-lg p-6 mb-6'>
-						<h2 className='text-lg font-semibold mb-4'>Download New Video</h2>
-						<form onSubmit={handleDownload} className='flex flex-col sm:flex-row gap-3'>
-							<Input
-								type='text'
-								value={downloadUrl}
-								onChange={(e) => setDownloadUrl(e.target.value)}
-								placeholder='Enter YouTube, Facebook or Instagram URL'
-								className='flex-1'
-							/>
-							<Button type='submit' className='bg-[#99BC85] hover:bg-[#88ab74] text-white'>
-								Download
-							</Button>
-						</form>
 					</div>
 
 					{/* Recent Downloads - Simplified */}
@@ -238,24 +188,46 @@ export function Dashboard({ token, setToken }: DashboardProps) {
 										<div className='flex items-center'>
 											<div
 												className={`w-2 h-2 rounded-full mr-3 ${
-													item.type === 'youtube'
+													item.platform === 'youtube'
 														? 'bg-red-500'
-														: item.type === 'facebook'
+														: item.platform === 'facebook'
 														? 'bg-blue-500'
-														: item.type === 'instagram'
+														: item.platform === 'instagram'
 														? 'bg-pink-500'
 														: 'bg-gray-500'
 												}`}
 											></div>
-											<a
-												href={item.url}
-												target='_blank'
-												rel='noopener noreferrer'
-												className='flex-1 text-sm text-blue-600 hover:underline truncate'
-											>
-												{item.url}
-											</a>
-											<span className='text-xs text-gray-500 ml-2'>{item.date}</span>
+											<div className='flex-1 min-w-0'>
+												<div className='flex items-center gap-2'>
+													<a
+														href={item.original_url}
+														target='_blank'
+														rel='noopener noreferrer'
+														className='text-sm text-blue-600 hover:underline truncate'
+													>
+														{item.original_url}
+													</a>
+												</div>
+												<p className='text-xs text-gray-500 mt-1'>
+													{new Date(item.downloaded_at).toLocaleDateString()} at{' '}
+													{new Date(item.downloaded_at).toLocaleTimeString()}
+												</p>
+											</div>
+											<div className='flex items-center gap-2 ml-2'>
+												<span
+													className={`text-xs px-2 py-1 rounded-full ${
+														item.platform === 'youtube'
+															? 'bg-red-100 text-red-700'
+															: item.platform === 'facebook'
+															? 'bg-blue-100 text-blue-700'
+															: item.platform === 'instagram'
+															? 'bg-pink-100 text-pink-700'
+															: 'bg-gray-100 text-gray-700'
+													}`}
+												>
+													{item.platform}
+												</span>
+											</div>
 										</div>
 									</div>
 								))}
@@ -263,18 +235,14 @@ export function Dashboard({ token, setToken }: DashboardProps) {
 						) : (
 							<div className='p-8 text-center text-gray-500'>
 								<p>No download history yet.</p>
-								<p className='text-sm mt-1'>Your recent downloads will appear here.</p>
+								<p className='text-sm mt-1'>
+									Your recent downloads will appear here after you download videos.
+								</p>
 							</div>
 						)}
 					</div>
 				</div>
 			</div>
-
-			<LogoutConfirmationModal
-				isOpen={isLogoutConfirmOpen}
-				onClose={() => setIsLogoutConfirmOpen(false)}
-				onConfirm={handleLogout}
-			/>
 		</>
 	);
 }

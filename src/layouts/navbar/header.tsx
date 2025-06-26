@@ -2,50 +2,65 @@ import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 import { LoginModal } from '@/components/modal/LoginModal';
 import { SignupModal } from '@/components/modal/SignupModal';
-import { LogoutConfirmationModal } from '@/components/modal/LogoutConfirmationModal';
-import { toast } from 'sonner';
+import { UserAvatar } from '@/components/ui/user-avatar';
 import { AUTH_TOKEN_KEY } from '@/constant';
+import { useNavigate } from 'react-router-dom';
 
 const Header = ({ setToken }: { setToken: (token: string) => void }) => {
+	const navigate = useNavigate();
 	const [activeSection, setActiveSection] = useState('home');
 	const [isLoginOpen, setIsLoginOpen] = useState(false);
 	const [isSignupOpen, setIsSignupOpen] = useState(false);
-	const [isLoggedIn, setIsLoggedIn] = useState(false);
-	const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
+	const [token, setLocalToken] = useState(localStorage.getItem(AUTH_TOKEN_KEY) || '');
 
-	// Check if user is logged in on component mount
+	// Update local token state when localStorage changes
 	useEffect(() => {
-		const storedToken = localStorage.getItem(AUTH_TOKEN_KEY);
-		setIsLoggedIn(!!storedToken);
+		const storedToken = localStorage.getItem(AUTH_TOKEN_KEY) || '';
+		setLocalToken(storedToken);
 	}, []);
 
-	// Listen for changes to the token via props
+	// Listen for storage changes (in case token is modified in another tab)
 	useEffect(() => {
-		// This will run whenever a token is set via the setToken prop
-		const checkLoginStatus = () => {
-			const storedToken = localStorage.getItem(AUTH_TOKEN_KEY);
-			setIsLoggedIn(!!storedToken);
+		const handleStorageChange = () => {
+			const storedToken = localStorage.getItem(AUTH_TOKEN_KEY) || '';
+			setLocalToken(storedToken);
 		};
 
-		checkLoginStatus();
-
-		// Add event listener for storage changes (in case token is modified in another tab)
-		window.addEventListener('storage', checkLoginStatus);
+		window.addEventListener('storage', handleStorageChange);
 
 		return () => {
-			window.removeEventListener('storage', checkLoginStatus);
+			window.removeEventListener('storage', handleStorageChange);
 		};
 	}, []);
 
-	// We're now directly using setIsLogoutConfirmOpen(true) instead of a separate function
+	// Create a custom event listener for token changes within the same tab
+	useEffect(() => {
+		const handleTokenChange = () => {
+			const storedToken = localStorage.getItem(AUTH_TOKEN_KEY) || '';
+			setLocalToken(storedToken);
+		};
 
-	// Actual logout handler once confirmed
-	const handleLogout = () => {
-		localStorage.removeItem(AUTH_TOKEN_KEY);
-		setIsLoggedIn(false);
-		setToken(''); // Clear token in parent component
-		setIsLogoutConfirmOpen(false);
-		toast.success('Logout successful! See you again soon.');
+		// Listen for custom token change events
+		window.addEventListener('tokenChanged', handleTokenChange);
+
+		return () => {
+			window.removeEventListener('tokenChanged', handleTokenChange);
+		};
+	}, []);
+
+	// Helper function to update token and trigger change event
+	const updateToken = (newToken: string) => {
+		setToken(newToken);
+		setLocalToken(newToken);
+		// Dispatch custom event to notify other components
+		window.dispatchEvent(new Event('tokenChanged'));
+	};
+
+	const isLoggedIn = !!token;
+
+	const handleLogoClick = () => {
+		navigate('/');
+		setActiveSection('home');
 	};
 
 	// Scroll navigation effect
@@ -81,7 +96,10 @@ const Header = ({ setToken }: { setToken: (token: string) => void }) => {
 				<div className='flex items-center justify-center py-2'>
 					<div className='flex items-center justify-between w-7xl'>
 						{/* LOGO */}
-						<div className='w-32 h-12 overflow-hidden rounded'>
+						<div
+							className='w-32 h-12 overflow-hidden rounded cursor-pointer'
+							onClick={handleLogoClick}
+						>
 							<img
 								src='./comot.in-header.png'
 								alt='Comot.In'
@@ -91,12 +109,14 @@ const Header = ({ setToken }: { setToken: (token: string) => void }) => {
 						{/* NAVIGATION */}
 						<ul className='flex items-center justify-center gap-10 w-1/2'>
 							<li>
-								<a
-									href='#home'
-									onClick={(e) => {
-										e.preventDefault();
-										document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' });
+								<button
+									onClick={() => {
+										navigate('/');
 										setActiveSection('home');
+										// Scroll to home section after navigation
+										setTimeout(() => {
+											document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' });
+										}, 100);
 									}}
 									className={`${
 										activeSection === 'home'
@@ -105,15 +125,17 @@ const Header = ({ setToken }: { setToken: (token: string) => void }) => {
 									} transition-colors`}
 								>
 									Home
-								</a>
+								</button>
 							</li>
 							<li>
-								<a
-									href='#guide'
-									onClick={(e) => {
-										e.preventDefault();
-										document.getElementById('guide')?.scrollIntoView({ behavior: 'smooth' });
+								<button
+									onClick={() => {
+										navigate('/');
 										setActiveSection('guide');
+										// Scroll to guide section after navigation
+										setTimeout(() => {
+											document.getElementById('guide')?.scrollIntoView({ behavior: 'smooth' });
+										}, 100);
 									}}
 									className={`${
 										activeSection === 'guide'
@@ -122,15 +144,17 @@ const Header = ({ setToken }: { setToken: (token: string) => void }) => {
 									} transition-colors`}
 								>
 									Guide
-								</a>
+								</button>
 							</li>
 							<li>
-								<a
-									href='#features'
-									onClick={(e) => {
-										e.preventDefault();
-										document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+								<button
+									onClick={() => {
+										navigate('/');
 										setActiveSection('features');
+										// Scroll to features section after navigation
+										setTimeout(() => {
+											document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+										}, 100);
 									}}
 									className={`${
 										activeSection === 'features'
@@ -139,15 +163,17 @@ const Header = ({ setToken }: { setToken: (token: string) => void }) => {
 									} transition-colors`}
 								>
 									Features
-								</a>
+								</button>
 							</li>
 							<li>
-								<a
-									href='#reviews'
-									onClick={(e) => {
-										e.preventDefault();
-										document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth' });
+								<button
+									onClick={() => {
+										navigate('/');
 										setActiveSection('reviews');
+										// Scroll to reviews section after navigation
+										setTimeout(() => {
+											document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth' });
+										}, 100);
 									}}
 									className={`${
 										activeSection === 'reviews'
@@ -156,19 +182,13 @@ const Header = ({ setToken }: { setToken: (token: string) => void }) => {
 									} transition-colors`}
 								>
 									Reviews
-								</a>
+								</button>
 							</li>
 						</ul>
 						{/* ACTIONS */}
 						<div className='flex items-center gap-2'>
 							{isLoggedIn ? (
-								<Button
-									variant='outline'
-									className='cursor-pointer border-red-500 text-red-500 hover:bg-red-500 hover:text-white'
-									onClick={() => setIsLogoutConfirmOpen(true)}
-								>
-									Logout
-								</Button>
+								<UserAvatar setToken={updateToken} />
 							) : (
 								<>
 									<Button
@@ -197,8 +217,7 @@ const Header = ({ setToken }: { setToken: (token: string) => void }) => {
 				isOpen={isLoginOpen}
 				onClose={() => setIsLoginOpen(false)}
 				setToken={(token) => {
-					setToken(token);
-					setIsLoggedIn(true);
+					updateToken(token);
 					setIsLoginOpen(false);
 				}}
 			/>
@@ -206,15 +225,9 @@ const Header = ({ setToken }: { setToken: (token: string) => void }) => {
 				isOpen={isSignupOpen}
 				onClose={() => setIsSignupOpen(false)}
 				setToken={(token) => {
-					setToken(token);
-					setIsLoggedIn(true);
+					updateToken(token);
 					setIsSignupOpen(false);
 				}}
-			/>
-			<LogoutConfirmationModal
-				isOpen={isLogoutConfirmOpen}
-				onClose={() => setIsLogoutConfirmOpen(false)}
-				onConfirm={handleLogout}
 			/>
 		</>
 	);

@@ -10,8 +10,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { API_BASE_URL, REGISTER_ENDPOINT, AUTH_TOKEN_KEY } from '@/constant';
+import { API_BASE_URL, AUTH_TOKEN_KEY } from '@/constant';
 
 export function SignupModal({
 	isOpen,
@@ -22,6 +23,7 @@ export function SignupModal({
 	onClose: () => void;
 	setToken: (token: string) => void;
 }) {
+	const navigate = useNavigate();
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
@@ -77,6 +79,8 @@ export function SignupModal({
 			localStorage.setItem(AUTH_TOKEN_KEY, data.access_token);
 			// Using setToken will trigger the App component to show Dashboard
 			setToken(data.access_token);
+			// Dispatch custom event to notify other components
+			window.dispatchEvent(new Event('tokenChanged'));
 			toast.success('Registration successful! Redirecting to dashboard...');
 
 			setName('');
@@ -84,6 +88,11 @@ export function SignupModal({
 			setPassword('');
 			setConfirmPassword('');
 			onClose();
+
+			// Navigate to dashboard after a short delay to allow token to be set
+			setTimeout(() => {
+				navigate('/dashboard');
+			}, 500);
 		} catch (error) {
 			// Display the actual error message from the server
 			const errorMessage = error instanceof Error ? error.message : 'Unknown error';

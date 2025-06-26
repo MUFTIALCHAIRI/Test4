@@ -45,9 +45,6 @@ export const REVIEW = [
 
 // API endpoints
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-export const LOGIN_ENDPOINT = import.meta.env.VITE_LOGIN_ENDPOINT || '/login';
-export const REGISTER_ENDPOINT = import.meta.env.VITE_REGISTER_ENDPOINT || '/register';
-export const USER_ENDPOINT = import.meta.env.VITE_USER_ENDPOINT || '/users/me';
 
 // Configuration
 export const AUTH_TOKEN_KEY = 'token';
