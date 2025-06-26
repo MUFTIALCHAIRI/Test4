@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button';
 import { REVIEW } from '@/constant';
 
 // Define the review item type
