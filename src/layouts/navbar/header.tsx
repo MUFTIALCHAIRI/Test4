@@ -66,7 +66,7 @@ const Header = ({ setToken }: { setToken: (token: string) => void }) => {
 	// Scroll navigation effect
 	useEffect(() => {
 		const handleScroll = () => {
-			const sections = ['home', 'guide', 'features', 'reviews'];
+			const sections = ['home', 'guide', 'features', 'pricing', 'reviews'];
 
 			// Find which section is currently in view
 			const current =
@@ -163,6 +163,25 @@ const Header = ({ setToken }: { setToken: (token: string) => void }) => {
 									} transition-colors`}
 								>
 									Features
+								</button>
+							</li>
+														<li>
+								<button
+									onClick={() => {
+										navigate('/');
+										setActiveSection('pricing');
+										// Scroll to features section after navigation
+										setTimeout(() => {
+											document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+										}, 100);
+									}}
+									className={`${
+										activeSection === 'pricing'
+											? 'text-[#99BC85] font-semibold'
+											: 'text-black hover:text-[#99BC85]'
+									} transition-colors`}
+								>
+									Pricing
 								</button>
 							</li>
 							<li>
