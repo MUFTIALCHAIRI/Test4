@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { useState, useEffect } from 'react';
 import ReviewContent from '@/layouts/ReviewContent';
 import FeatureContent from '@/layouts/FeatureContent';
+import PricingContent from '@/layouts/PricingContent';
 import GuideContent from '@/layouts/GuideContent';
 import { incrementDownloadCount, checkLimitReached } from '@/lib/utils';
 import { API_BASE_URL, AUTH_TOKEN_KEY } from '@/constant';
@@ -541,6 +542,10 @@ export function Homepage() {
 			{/* FEATURES SECTION */}
 			<section id='features' className='flex items-center justify-center'>
 				<FeatureContent />
+			</section>
+			{/* PRICING SECTION */}
+			<section id='pricing' className='flex items-center justify-center'>
+				<PricingContent />
 			</section>
 
 			{/* REVIEWS SECTION */}
